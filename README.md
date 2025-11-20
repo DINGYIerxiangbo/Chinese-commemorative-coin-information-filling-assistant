@@ -1,6 +1,8 @@
-**纪念币信息填写助手**
+<div align="center">
+  
+#  纪念币信息填写助手<br>Commemorative Coin Information Filling Assistant
 
-**Commemorative Coin Information Filling Assistant**
+</div>
 
 纪念币信息填写助手是一款专为纪念币预约设计的Chrome浏览器扩展程序
 
@@ -24,7 +26,7 @@ src="https://github.com/user-attachments/assets/6d45fe39-cd94-429d-8cd6-8d5ae585
 
 ## 简介
 
-## 安全性设计/Security Design
+### 安全性设计/Security Design
 
 域名白名单机制：仅在授权的银行官方网站运行，防止恶意使用
 
@@ -47,7 +49,7 @@ src="https://github.com/user-attachments/assets/365f748b-a513-478a-b1eb-3bf66181
 />
 </div>
 
-## 高效便捷/Efficiency & Convenience
+### 高效便捷/Efficiency & Convenience
 
 一键填充：在支持的银行页面快速填充已保存的个人信息
 
@@ -76,7 +78,7 @@ src="https://github.com/user-attachments/assets/f4598d8b-d328-4ea3-a100-f71b574c
 />
 </div>
 
-## 多银行支持/Multi-Bank Support
+### 多银行支持/Multi-Bank Support
 
 目前支持以下银行的纪念币预约页面：
 
@@ -93,7 +95,7 @@ Bank of Communications, Bank of China, Agricultural Bank of China, ICBC
 China Construction Bank, Huaxia Bank, Postal Savings Bank, SPD Bank
 
 Bank of Suzhou, Huishang Bank, Shaanxi Rural Credit Union (No web
-version, WeChat Mini Program)
+version, WeChat Mini Program only)
 
 <div align="center">
 <img width="364" height="500" alt="5"
@@ -101,7 +103,7 @@ src="https://github.com/user-attachments/assets/6bb085e8-80b6-4ad4-820c-e807328d
 />
 </div>
 
-## 数据管理/Data Management
+### 数据管理/Data Management
 
 导入导出：支持预约信息的备份和恢复
 
