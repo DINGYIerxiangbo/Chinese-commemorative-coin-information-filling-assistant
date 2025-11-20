@@ -153,12 +153,17 @@ src="https://github.com/user-attachments/assets/28145a04-3f11-4474-bbd8-f7af0114
 
 安装步骤：
 
-下载插件文件包并解压缩打开Chrome浏览器，进入扩展程序管理页面（chrome://extensions/
+下载“纪念币信息填写助手.crx”，进入扩展程序管理页面（XXXXX://extensions/
+）<img width="322" height="38" alt="7" src="https://github.com/user-attachments/assets/133fc012-99b3-4f04-a2f2-22741993f892" />，直接拖入浏览器页面，点击确认安装
+
+Download the "Commemorative Coin Information Filling Assistant.crx" file, navigate to the extension management page (XXXXX://extensions/)<img width="322" height="38" alt="7" src="https://github.com/user-attachments/assets/133fc012-99b3-4f04-a2f2-22741993f892" />, then drag and drop the CRX file directly into the browser's extension management page and confirm the installation.
+
+下载插件文件包并解压缩打开浏览器，进入扩展程序管理页面（XXXXX://extensions/
 ）<img width="322" height="38" alt="7" src="https://github.com/user-attachments/assets/133fc012-99b3-4f04-a2f2-22741993f892" />开启右上角的"开发者模式"<img width="119" height="29" alt="8" src="https://github.com/user-attachments/assets/950faf6a-ecf9-4ff8-850b-d71c19ae81c8" />点击"加载已解压的扩展程序"<img width="176" height="42" alt="9" src="https://github.com/user-attachments/assets/e62aba8b-77c0-4810-8ed8-c6a8313647dd" />，选择解压后的文件夹<img width="107" height="139" alt="10" src="https://github.com/user-attachments/assets/edb9b6b3-0722-4daa-9f22-d988f8b95244" />安装成功后，浏览器工具栏将显示插件图标
 
 Installation Steps:
 
-Download the plugin file package and extract it.Open the Chrome browser and go to the Extensions management page (chrome://extensions/)<img width="322" height="38" alt="7" src="https://github.com/user-attachments/assets/133fc012-99b3-4f04-a2f2-22741993f892" />.Enable "Developer mode" in the top-right corner<img width="119" height="29" alt="8" src="https://github.com/user-attachments/assets/950faf6a-ecf9-4ff8-850b-d71c19ae81c8" />.Click "Load unpacked extension" <img width="176" height="42" alt="9" src="https://github.com/user-attachments/assets/e62aba8b-77c0-4810-8ed8-c6a8313647dd" />and select the extracted folder<img width="107" height="139" alt="10" src="https://github.com/user-attachments/assets/edb9b6b3-0722-4daa-9f22-d988f8b95244" />.After successful installation, the plugin icon will appear in the browser toolbar.
+Download the plugin file package and extract it.Open the browser and go to the Extensions management page (XXXXX://extensions/)<img width="322" height="38" alt="7" src="https://github.com/user-attachments/assets/133fc012-99b3-4f04-a2f2-22741993f892" />.Enable "Developer mode" in the top-right corner<img width="119" height="29" alt="8" src="https://github.com/user-attachments/assets/950faf6a-ecf9-4ff8-850b-d71c19ae81c8" />.Click "Load unpacked extension" <img width="176" height="42" alt="9" src="https://github.com/user-attachments/assets/e62aba8b-77c0-4810-8ed8-c6a8313647dd" />and select the extracted folder<img width="107" height="139" alt="10" src="https://github.com/user-attachments/assets/edb9b6b3-0722-4daa-9f22-d988f8b95244" />.After successful installation, the plugin icon will appear in the browser toolbar.
 
 启动方式：
 
@@ -233,7 +238,7 @@ Click the "Sort" button to enter sorting mode.Drag and drop information items to
 
 <img width="34" height="23" alt="17" src="https://github.com/user-attachments/assets/06272d95-def5-456d-b71c-1c96ef163da7" />
 
-#### 2. 银行预约功能/2. Bank Appointment Function
+#### 2. 银行功能/2. Bank Function
 
 快速访问：
 
@@ -243,13 +248,7 @@ Quick Access:
 
 The "Bank Appointment Links" section displays 11 supported banks.Click the bank name to directly jump to the corresponding appointment page.Supports collapse/expand display to save space.
 
-银行排序：
-
-点击银行列表右上角的"排序"按钮拖拽银行项调整顺序完成排序后点击"完成"
-
-Bank Sorting:
-
-Click the "Sort" button in the topright corner of the bank list.Drag and drop bank items to adjust the order.Click "Done" after completing the sorting.
+<img width="334" height="189" alt="18" src="https://github.com/user-attachments/assets/735298f8-b3af-4c78-9d1b-fcf1000397c2" />
 
 特殊银行说明：
 
@@ -278,7 +277,17 @@ Operation Steps:
 Open the commemorative coin appointment page of the target bank.Click the "Fill" button on the right side of the information item in the plugin main interface.The system automatically identifies and fills in the form fields.Check the fill result prompt 
 to confirm successful filling.
 
+<img width="37" height="24" alt="19" src="https://github.com/user-attachments/assets/cf9c7fac-0a68-4e39-9689-ed5906d4465d" />
+
 #### 4. 数据管理功能/4. Data Management Function
+
+检查信息：
+
+完整显示所有已保存的个人信息字段，方便用户检查和修正已保存的数据
+
+Completely display all saved personal information fields for easy review and correction of stored data.
+
+<img width="111" height="33" alt="20" src="https://github.com/user-attachments/assets/c5a62f52-0527-4e15-b9eb-104b06ed5b21" />
 
 导出数据：
 
@@ -288,6 +297,8 @@ Export Data:
 
 Click the "Export" button in the bottom toolbar.Automatically generate and download a JSON format file.The file contains all saved information data.
 
+<img width="222" height="67" alt="21" src="https://github.com/user-attachments/assets/b8e5412a-68c5-4436-98f1-95a0d079aae4" />
+
 导入数据：
 
 点击"导入"按钮选择备份文件系统验证数据格式并导入有效信息显示导入结果统计
@@ -296,6 +307,8 @@ Import Data:
 
 Click the "Import" button to select a backup file.The system verifies the data format and imports valid information.Display import result statistics.
 
+<img width="216" height="66" alt="22" src="https://github.com/user-attachments/assets/d58d2786-e055-4710-add2-bf177419a887" />
+
 功能开关：
 
 自动获取验证码：开启后尝试自动识别短信验证码自动填充：进入预约页面时自动触发填充功能
@@ -303,6 +316,8 @@ Click the "Import" button to select a backup file.The system verifies the data f
 Function Switches:
 
 Automatic verification code retrieval: When enabled, attempts to automatically identify SMS verification codes.Automatic fill: Automatically triggers the fill function when entering the appointment page.
+
+<img width="336" height="168" alt="23" src="https://github.com/user-attachments/assets/664426df-2d7c-43dc-aee1-3b2a039ff24f" />
 
 ### 三、注意事项/III. Precautions
 
