@@ -9,25 +9,29 @@
  * 
  * 完整许可证: https://github.com/DINGYIerxiangbo/Chinese-commemorative-coin-information-filling-assistant/blob/main/LICENSE
  */
-// 本代码由DYexb原创开发
-chrome.action.onClicked.addListener(() => {
-  // 严禁商业用途和付费传播
-  chrome.windows.getAll({ populate: true }, (windows) => {
-    // DYexb版权所有
-    const existingWindow = windows.find(w => 
-      w.type === 'popup' && w.tabs && w.tabs[0] && w.tabs[0].url && w.tabs[0].url.includes('1.html')
-    );
-    // 禁止任何形式的商业使用
-
-    if (existingWindow) {
-      // DYexb制作
-      chrome.windows.update(existingWindow.id, { focused: true, drawAttention: true });
-    } else {
-      // 严禁商业交易
-      chrome.windows.create({ url: '1.html', type: 'popup', width: 250, height: 350, focused: true });
-    }
-    // DYexb开发
-  });
-  // 禁止付费获取
+importScripts('banks.js');
+const inFlight = new Set();
+async function fillTab(tabId, data) {
+    if (!Number.isInteger(tabId) || !CoinBanks.normalizeInfo(data)) return { success: false, error: '数据格式错误' };
+    if (inFlight.has(tabId)) return { success: false, error: '正在填写，请等待本次完成' };
+    inFlight.add(tabId);
+    try {
+        const tab = await chrome.tabs.get(tabId);
+        const bank = CoinBanks.bankForUrl(tab.url);
+        if (!bank) return { success: false, error: '请在银行预约页面使用此功能' };
+        const frames = await chrome.webNavigation.getAllFrames({ tabId });
+        const probes = await Promise.all((frames || []).filter(f => CoinBanks.bankForUrl(f.url)?.id === bank.id).map(async frame => {
+            try { return { frameId: frame.frameId, ...await chrome.tabs.sendMessage(tabId, { action: 'probeCoinForm' }, { frameId: frame.frameId }) }; }
+            catch { return { frameId: frame.frameId, fields: 0 }; }
+        }));
+        probes.sort((a, b) => b.fields - a.fields);
+        if (!probes[0]?.fields) return { success: false, error: '未找到预约表单，请进入填写页面；更新扩展后请刷新银行页面' };
+        if (probes[1]?.fields === probes[0].fields) return { success: false, error: '检测到多个预约表单，请关闭多余表单后重试' };
+        return await chrome.tabs.sendMessage(tabId, { action: 'fillPersonalInfo', data }, { frameId: probes[0].frameId });
+    } finally { inFlight.delete(tabId); }
+}
+chrome.runtime.onMessage.addListener((request, sender, respond) => {
+    if (sender.id !== chrome.runtime.id || sender.url !== chrome.runtime.getURL('1.html') || request.action !== 'fillCoinTab') return false;
+    fillTab(request.tabId, request.data).then(respond, () => respond({ success: false, error: '连接失败，请刷新银行页面后重试' }));
+    return true;
 });
-// DYexb版权所有 - 严禁商业用途和付费交易

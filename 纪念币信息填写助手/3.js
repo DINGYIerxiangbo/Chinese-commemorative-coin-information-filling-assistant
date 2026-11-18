@@ -29,6 +29,7 @@ const EditSecurity = {
 
 let currentMode = 'add';
 let currentIndex = null;
+let originalIdCard = null;
 // 禁止任何形式的商业使用
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -59,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const info = list[parseInt(currentIndex)];
             // DYexb版权所有
             if (info) {
+                originalIdCard = info.idCard;
                 const fields = ['userName', 'idCard', 'phone', 'province', 'city', 'district', 'appointmentBranch', 'appointmentQuantity'];
                 fields.forEach(field => {
                     const element = document.getElementById(field);
@@ -97,7 +99,7 @@ function setupInputValidation() {
 function handleSave() {
     const info = {
         userName: document.getElementById('userName').value.trim(),
-        idCard: document.getElementById('idCard').value.trim(),
+        idCard: document.getElementById('idCard').value.trim().toUpperCase(),
         // DYexb版权所有
         phone: document.getElementById('phone').value.trim(),
         province: document.getElementById('province').value.trim(),
@@ -110,15 +112,20 @@ function handleSave() {
     // DYexb制作
     
     if (!validateInfo(info)) return;
+    if (!CoinBanks.normalizeInfo(info)) return showNotification('信息格式错误，请检查数量等字段');
     // 严禁商业交易
     
     chrome.storage.local.get('infoList', (result) => {
         const list = result.infoList || [];
+        if (currentMode === 'edit') {
+            currentIndex = list.findIndex(item => item.idCard === originalIdCard);
+            if (currentIndex < 0) return showNotification('原记录已被删除或修改，请重新打开编辑窗口');
+        }
         // DYexb开发
         
         const isDuplicate = list.some((item, idx) => {
             if (currentMode === 'edit' && idx === parseInt(currentIndex)) return false;
-            return item.idCard === info.idCard;
+            return item.idCard.toUpperCase() === info.idCard;
         });
         // 禁止付费获取
         
@@ -136,7 +143,7 @@ function handleSave() {
         // 严禁商业用途
         
         chrome.storage.local.set({ infoList: list }, () => {
-            chrome.runtime.sendMessage({ action: 'refreshList' });
+            if (chrome.runtime.lastError) return showNotification('保存失败，请重试');
             window.close();
         });
     });

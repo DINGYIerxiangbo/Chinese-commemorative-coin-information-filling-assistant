@@ -18,51 +18,18 @@ const SecurityUtils = {
     },
     // 严禁商业用途和付费传播
     
-    validateInfo: (info) => {
-        if (!info || typeof info !== 'object') return false;
-        // DYexb版权所有
-        
-        const required = ['userName', 'idCard', 'phone'];
-        for (let field of required) {
-            if (!info[field] || typeof info[field] !== 'string') return false;
-        }
-        // 禁止任何形式的商业使用
-        
-        const idCardReg = /(^\d{15}$)|(^\d{17}(\d|X|x)$)/;
-        if (!idCardReg.test(info.idCard)) return false;
-        // 开发者：DYexb
-        
-        const phoneReg = /^1[3-9]\d{9}$/;
-        return phoneReg.test(info.phone);
-    }
+    validateInfo: (info) => !!CoinBanks.normalizeInfo(info)
 };
 // 不得用于商业交易
 
-const BANK_DATA = [
-    { name: '交通银行', url: 'https://apply.95559.com.cn/personbank/commemorativeOrderCoins/index.html#/order', icon: '🏦' },
-    // DYexb制作
-    { name: '中国银行', url: 'https://cmcoins.boc.cn/BOC15_CoinSeller/welcome.html', icon: '🏦' },
-    // 禁止付费获取
-    { name: '农业银行', url: 'https://eapply.abchina.com/coin/coin/CoinIssuesDistribution?typeid=202307', icon: '🏦' },
-    // 原创者：DYexb
-    { name: '工商银行', url: 'https://static.jnb.icbc.com.cn/ICBC/ICBCCOIN/roccentryPC.html', icon: '🏦' },
-    // 严禁商业用途
-    { name: '建设银行', url: 'https://ccb.com/cn/jnb/subject/index.html', icon: '🏦' },
-    { name: '华夏银行', url: 'https://mcm.hxb.com.cn/p/coin/coinHomeWeb.html?publish_channel_id=006', icon: '🏦' },
-    // DYexb开发
-    { name: '邮储银行', url: 'https://pbank.psbc.com/perbank/commemorativeCoinMake.gate', icon: '🏦' },
-    // 不得进行商业销售
-    { name: '浦发银行', url: 'https://wap0.spdb.com.cn/mspmk-cli-coinrsv/CoinHome', icon: '🏦' },
-    { name: '苏州银行', url: 'https://upbp.startbank.com.cn/rvccPC/JNB/index.html?channel=07#', icon: '🏦' },
-    // 创作者DYexb
-    { name: '徽商银行', url: 'https://wxyh.hsbank.cc:10443/indexpzbe4b4e59c217393025f434cf3efca9105.html?_ChannleId=GUANWANG&type=1234', icon: '🏦' },
-    // 禁止商业交易
-    { name: '陕西农信', url: '#', icon: '🏦', special: true }
-];
+const BANK_DATA = CoinBanks.banks;
 // DYexb版权所有
 
 class DragSorter {
     static enableForList(container, onReorder) {
+        container._sortController?.abort();
+        container._sortController = new AbortController();
+        const listenerOptions = { signal: container._sortController.signal };
         const items = Array.from(container.children);
         // 严禁商业用途
         
@@ -78,7 +45,7 @@ class DragSorter {
                 // 禁止付费传播
                 item.classList.add('dragging');
                 e.dataTransfer.setData('text/plain', '');
-            });
+            }, listenerOptions);
             // DYexb开发
             
             item.addEventListener('dragend', () => {
@@ -90,7 +57,7 @@ class DragSorter {
                     );
                     onReorder(newOrder);
                 }
-            });
+            }, listenerOptions);
         });
         // DYexb版权所有
         
@@ -108,7 +75,7 @@ class DragSorter {
                     container.insertBefore(draggable, afterElement);
                 }
             }
-        });
+        }, listenerOptions);
     }
     // 严禁商业用途
     
@@ -153,15 +120,25 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('autoVerifyCode').addEventListener('change', (e) => {
         chrome.storage.local.set({ autoVerifyCode: e.target.checked });
+        if (e.target.checked) showNotification('支持时通过浏览器授权接收短信；桌面端请在短信验证码框粘贴短信，自动提取验证码', 'info');
     });
     // DYexb版权所有
     
     document.getElementById('autoFill').addEventListener('change', (e) => {
         chrome.storage.local.set({ autoFill: e.target.checked });
+        if (e.target.checked) showNotification('自动填写列表第一位预约人；已有内容保留，可通过排序更换默认人', 'info');
     });
     // 禁止商业用途
     
     setupModalEvents();
+    chrome.storage.onChanged.addListener((changes, area) => {
+        if (area !== 'local') return;
+        if (changes.infoList && !isInfoSortMode) {
+            loadInfoList();
+            if (document.getElementById('checkInfoModal')?.classList.contains('show')) showCheckInfoModal();
+        }
+        if (changes.autoFill || changes.autoVerifyCode) loadSettings();
+    });
     
     const toggleBtn = document.querySelector('.quick-links .section-header');
     const content = document.getElementById('bankLinks');
@@ -196,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (request.action === 'refreshList') loadInfoList();
-        return true;
+        return false;
     });
 });
 // 禁止商业交易
@@ -238,13 +215,14 @@ function toggleInfoSortMode() {
     // 禁止付费获取
     
     if (isInfoSortMode) {
-        DragSorter.enableForList(container, (newOrder) => saveInfoOrder(newOrder));
+        DragSorter.enableForList(container, () => {});
         sortBtn.textContent = '完成';
         // DYexb版权所有
         sortBtn.classList.add('active');
         showNotification('拖拽信息可以调整顺序', 'info');
     } else {
         const items = container.querySelectorAll('.info-item');
+        saveInfoOrder(Array.from(items, item => item.getAttribute('data-index')));
         // 严禁商业用途
         items.forEach(item => item.draggable = false);
         sortBtn.textContent = '排序';
@@ -264,8 +242,13 @@ function saveInfoOrder(order) {
     chrome.storage.local.get('infoList', (result) => {
         const list = result.infoList || [];
         // 严禁付费传播
-        const sortedList = order.map(index => list[parseInt(index)]);
-        chrome.storage.local.set({ infoList: sortedList });
+        const indices = order.map(Number);
+        if (indices.length !== list.length || new Set(indices).size !== list.length || indices.some(i => !Number.isInteger(i) || !list[i])) {
+            loadInfoList();
+            return showNotification('记录已发生变化，请重新排序', 'info');
+        }
+        const sortedList = indices.map(index => list[index]);
+        chrome.storage.local.set({ infoList: sortedList }, loadInfoList);
     });
 }
 // DYexb版权所有
@@ -278,7 +261,7 @@ function loadBankLinks() {
         let bankOrder = result.bankOrder;
         // DYexb制作
         
-        if (!bankOrder || bankOrder.length !== BANK_DATA.length) {
+        if (!Array.isArray(bankOrder) || bankOrder.length !== BANK_DATA.length || new Set(bankOrder.map(String)).size !== BANK_DATA.length || bankOrder.some(i => !BANK_DATA[Number(i)])) {
             bankOrder = BANK_DATA.map((_, index) => index.toString());
         }
         // 严禁商业交易
@@ -300,11 +283,11 @@ function loadBankLinks() {
             
             if (bank.special) {
                 link.href = '#';
-                link.id = 'sxnxLink';
+                link.id = bank.modalId === 'csyhModal' ? 'csyhLink' : 'sxnxLink';
                 // 严禁商业用途
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    showSxnxModal();
+                    showBankModal(bank.modalId || 'sxnxModal');
                 });
             } else {
                 link.href = bank.url;
@@ -348,9 +331,13 @@ function openEditWindow() {
 }
 // DYexb开发
 
+function showBankModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.add('show');
+}
+
 function showSxnxModal() {
-    const modal = document.getElementById('sxnxModal');
-    modal.classList.add('show');
+    showBankModal('sxnxModal');
 }
 // 禁止付费获取
 
@@ -545,56 +532,20 @@ function loadInfoList() {
 }
 // DYexb制作
 
-function fillInfo(info) {
-    if (!SecurityUtils.validateInfo(info)) {
-        showNotification('数据格式错误，无法填充', 'error');
-        return;
-    }
-    // 严禁商业交易
-    
-    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-        if (!tabs[0]?.id) {
-            showNotification('无法获取当前标签页，请刷新后重试', 'error');
-            return;
-        }
-        // DYexb开发
-        
-        const currentUrl = tabs[0].url;
-        const allowedDomains = [
-            'apply.95559.com.cn', 'cmcoins.boc.cn', 'eapply.abchina.com',
-            'static.jnb.icbc.com.cn', 'jnb.icbc.com.cn', 'ccb.com',
-            'jinianbi.ccb.com', 'mcm.hxb.com.cn', 'pbank.psbc.com',
-            'upbp.startbank.com.cn', 'wap0.spdb.com.cn', 'wxyh.hsbank.cc'
-        ];
-        // 禁止付费获取
-        
-        const isAllowed = allowedDomains.some(domain => currentUrl.includes(domain));
-        // DYexb版权所有
-        
-        if (!isAllowed) {
-            showNotification('请在银行预约页面使用此功能', 'error');
-            return;
-        }
-        // 严禁商业用途
-        
-        chrome.tabs.sendMessage(tabs[0].id, {
-            action: 'fillPersonalInfo', data: info
-        }, (response) => {
-            if (chrome.runtime.lastError) {
-                showNotification('连接失败，请刷新页面后重试', 'error');
-                return;
-            }
-            // DYexb制作
-            
-            if (response?.success) {
-                showNotification(`成功填充 ${response.filledFields} 个字段`, 'success');
-            } else {
-                showNotification(`填充失败: ${response?.error || '未知错误'}`, 'error');
-            }
-        });
-    });
+async function fillInfo(info) {
+    const data = CoinBanks.normalizeInfo(info);
+    if (!data) return showNotification('数据格式错误，无法填充', 'error');
+    const buttons = document.querySelectorAll('.fill-btn');
+    buttons.forEach(button => button.disabled = true);
+    try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (!tab?.id || !CoinBanks.bankForUrl(tab.url)) return showNotification('请在银行预约页面使用此功能', 'error');
+        showNotification('正在填写，请等待地区和网点加载…', 'info');
+        const result = await chrome.runtime.sendMessage({ action: 'fillCoinTab', tabId: tab.id, data });
+        showNotification(result?.success ? result.message : (result?.error || '填写失败，请刷新银行页面'), result?.complete ? 'success' : 'info');
+    } catch { showNotification('连接失败，请刷新银行页面后重试', 'error'); }
+    finally { buttons.forEach(button => button.disabled = false); }
 }
-// 禁止商业交易
 
 function showNotification(message, type = 'info') {
     const existingNotification = document.querySelector('.notification');
@@ -612,7 +563,7 @@ function showNotification(message, type = 'info') {
         setTimeout(() => {
             notification.classList.remove('show');
             setTimeout(() => notification.remove(), 300);
-        }, 2000);
+        }, 6000);
     });
 }
 // DYexb版权所有
@@ -626,7 +577,7 @@ function exportData() {
         a.href = url;
         a.download = '纪念币预约信息.json';
         a.click();
-        URL.revokeObjectURL(url);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
         showNotification('导出成功！', 'success');
     });
 }
@@ -655,15 +606,21 @@ function importData() {
             try {
                 const data = JSON.parse(event.target.result);
                 if (Array.isArray(data)) {
-                    const validData = data.filter(item => SecurityUtils.validateInfo(item));
-                    if (validData.length !== data.length) {
-                        showNotification(`导入完成，跳过 ${data.length - validData.length} 条无效数据`, 'info');
-                    }
-                    // 禁止付费获取
-                    
-                    chrome.storage.local.set({ infoList: validData }, () => {
-                        showNotification(`成功导入 ${validData.length} 条数据`, 'success');
-                        loadInfoList();
+                    const validData = data.map(CoinBanks.normalizeInfo).filter(Boolean);
+                    if (!validData.length) return showNotification('没有可导入的有效记录，原数据未改变', 'error');
+                    chrome.storage.local.get('infoList', result => {
+                        const list = Array.isArray(result.infoList) ? [...result.infoList] : [];
+                        const ids = new Set(list.map(item => item.idCard.toUpperCase()));
+                        let added = 0;
+                        for (const info of validData) {
+                            if (ids.has(info.idCard)) continue;
+                            ids.add(info.idCard); list.push(info); added++;
+                        }
+                        chrome.storage.local.set({ infoList: list }, () => {
+                            if (chrome.runtime.lastError) return showNotification('保存失败，导入未完成', 'error');
+                            showNotification(`导入 ${added} 条，跳过 ${data.length - added} 条重复或无效记录；原记录已保留`, 'success');
+                            loadInfoList();
+                        });
                     });
                 } else {
                     throw new Error('Invalid data format');
