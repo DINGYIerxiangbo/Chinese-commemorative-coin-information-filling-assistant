@@ -1,0 +1,18 @@
+# 系统 / 编辑器
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# 依赖与构建
+node_modules/
+__pycache__/
+*.pyc
+
+# 打包与临时产物
+*.pem
+*.zip
+!纪念币信息填写助手-*.zip
+_verify_*.html
+_*.py
