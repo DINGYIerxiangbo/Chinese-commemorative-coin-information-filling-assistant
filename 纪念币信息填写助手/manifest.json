@@ -4,10 +4,10 @@
   "version": "1.1.0",
   "description": "快速填写纪念币预约表单的 Chrome 扩展 - 严禁商业用途和付费交易 - 版权归DYexb所有",
   "icons": {
-    "16": "logo.png",
-    "32": "logo.png",
-    "48": "logo.png",
-    "128": "logo.png"
+    "16": "icon16.png",
+    "32": "icon32.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
   },
   "permissions": [
     "storage",
@@ -63,36 +63,6 @@
       ],
       "run_at": "document_idle",
       "all_frames": true
-    }
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "3.html",
-        "3.css",
-        "3.js",
-        "sxnx.png",
-        "logo.png",
-        "csyh.png"
-      ],
-      "matches": [
-        "https://apply.95559.com.cn/*",
-        "https://cmcoins.boc.cn/*",
-        "https://eapply.abchina.com/*",
-        "https://static.jnb.icbc.com.cn/*",
-        "https://jnb.icbc.com.cn/*",
-        "https://ccb.com/*",
-        "https://jinianbi.ccb.com/*",
-        "https://mcm.hxb.com.cn/*",
-        "https://pbank.psbc.com/*",
-        "https://upbp.startbank.com.cn/*",
-        "https://wap0.spdb.com.cn/*",
-        "https://wxyh.hsbank.cc/*",
-        "https://www.ccb.com/*",
-        "https://download.hsbank.cc/*",
-        "https://jnb.hxb.com.cn/*",
-        "https://jinianbi.ccb.cn/*"
-      ]
     }
   ],
   "content_security_policy": {

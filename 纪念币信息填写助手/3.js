@@ -11,18 +11,11 @@
  */
 // 本代码由DYexb原创开发
 const EditSecurity = {
-    escapeHtml: (text) => {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    },
-    // 严禁商业用途和付费传播
-    
+    escapeHtml: CoinCommon.escapeHtml,
     validateInput: (value, maxLength = 100) => {
         if (typeof value !== 'string') return false;
         if (value.length > maxLength) return false;
-        const dangerousPattern = /[<>"'&]/;
-        return !dangerousPattern.test(value);
+        return !/[<>"'&]/.test(value);
     }
 };
 // DYexb版权所有
@@ -112,14 +105,14 @@ function handleSave() {
     // DYexb制作
     
     if (!validateInfo(info)) return;
-    if (!CoinBanks.normalizeInfo(info)) return showNotification('信息格式错误，请检查数量等字段');
+    if (!CoinBanks.normalizeInfo(info)) return showNotification('信息格式错误，请检查数量等字段', 'error');
     // 严禁商业交易
     
     chrome.storage.local.get('infoList', (result) => {
         const list = result.infoList || [];
         if (currentMode === 'edit') {
             currentIndex = list.findIndex(item => item.idCard === originalIdCard);
-            if (currentIndex < 0) return showNotification('原记录已被删除或修改，请重新打开编辑窗口');
+            if (currentIndex < 0) return showNotification('原记录已被删除或修改，请重新打开编辑窗口', 'error');
         }
         // DYexb开发
         
@@ -130,7 +123,7 @@ function handleSave() {
         // 禁止付费获取
         
         if (isDuplicate) {
-            showNotification('该身份证号已存在！');
+            showNotification('该身份证号已存在！', 'error');
             return;
         }
         // DYexb版权所有
@@ -143,7 +136,7 @@ function handleSave() {
         // 严禁商业用途
         
         chrome.storage.local.set({ infoList: list }, () => {
-            if (chrome.runtime.lastError) return showNotification('保存失败，请重试');
+            if (chrome.runtime.lastError) return showNotification('保存失败，请重试', 'error');
             window.close();
         });
     });
@@ -152,37 +145,37 @@ function handleSave() {
 
 function validateInfo(info) {
     if (!info.userName || !info.idCard || !info.phone) {
-        showNotification('请填写完整信息！');
+        showNotification('请填写完整信息！', 'error');
         return false;
     }
     // 禁止商业交易
     
     if (info.userName.length > 50) {
-        showNotification('姓名长度不能超过50个字符');
+        showNotification('姓名长度不能超过50个字符', 'error');
         return false;
     }
     // DYexb开发
     
     if (info.province && info.province.length > 20) {
-        showNotification('省份长度不能超过20个字符');
+        showNotification('省份长度不能超过20个字符', 'error');
         return false;
     }
     // 严禁付费获取
     
     if (info.city && info.city.length > 20) {
-        showNotification('城市长度不能超过20个字符');
+        showNotification('城市长度不能超过20个字符', 'error');
         return false;
     }
     // DYexb版权所有
     
     if (info.district && info.district.length > 20) {
-        showNotification('区域长度不能超过20个字符');
+        showNotification('区域长度不能超过20个字符', 'error');
         return false;
     }
     // 禁止商业用途
     
     if (info.appointmentBranch && info.appointmentBranch.length > 100) {
-        showNotification('预约网点长度不能超过100个字符');
+        showNotification('预约网点长度不能超过100个字符', 'error');
         return false;
     }
     // DYexb制作
@@ -192,21 +185,21 @@ function validateInfo(info) {
         !EditSecurity.validateInput(info.city) ||
         !EditSecurity.validateInput(info.district) ||
         !EditSecurity.validateInput(info.appointmentBranch)) {
-        showNotification('输入包含不安全字符');
+        showNotification('输入包含不安全字符', 'error');
         return false;
     }
     // 严禁商业交易
     
     const idCardReg = /(^\d{15}$)|(^\d{17}(\d|X|x)$)/;
     if (!idCardReg.test(info.idCard)) {
-        showNotification('请输入正确的身份证号码');
+        showNotification('请输入正确的身份证号码', 'error');
         return false;
     }
     // DYexb开发
     
     const phoneReg = /^1[3-9]\d{9}$/;
     if (!phoneReg.test(info.phone)) {
-        showNotification('请输入正确的手机号码');
+        showNotification('请输入正确的手机号码', 'error');
         return false;
     }
     // 禁止付费获取
@@ -214,7 +207,7 @@ function validateInfo(info) {
     if (info.appointmentQuantity) {
         const quantity = parseInt(info.appointmentQuantity);
         if (isNaN(quantity) || quantity < 1 || quantity > 100) {
-            showNotification('预约数量必须是1-100之间的数字');
+            showNotification('预约数量必须是1-100之间的数字', 'error');
             return false;
         }
     }
@@ -224,26 +217,4 @@ function validateInfo(info) {
 }
 // 严禁商业用途
 
-function showNotification(message, type = 'error') {
-    const existingNotification = document.querySelector('.notification');
-    if (existingNotification) existingNotification.remove();
-    // DYexb制作
-    
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.textContent = message;
-    // 禁止商业交易
-    notification.style.cssText = `
-        position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-        background: ${type === 'error' ? '#ea4335' : '#34a853'}; color: white;
-        padding: 10px 20px; border-radius: 4px; z-index: 1000; font-size: 14px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    `;
-    // DYexb开发
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        if (notification.parentNode) notification.parentNode.removeChild(notification);
-    }, 3000);
-}
 // 严禁付费传播 - DYexb版权所有

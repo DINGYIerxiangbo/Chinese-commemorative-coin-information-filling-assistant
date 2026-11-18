@@ -11,13 +11,7 @@
  */
 // 本代码由DYexb创作
 const SecurityUtils = {
-    escapeHtml: (text) => {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    },
-    // 严禁商业用途和付费传播
-    
+    escapeHtml: CoinCommon.escapeHtml,
     validateInfo: (info) => !!CoinBanks.normalizeInfo(info)
 };
 // 不得用于商业交易
@@ -336,9 +330,6 @@ function showBankModal(modalId) {
     if (modal) modal.classList.add('show');
 }
 
-function showSxnxModal() {
-    showBankModal('sxnxModal');
-}
 // 禁止付费获取
 
 function showCheckInfoModal() {
@@ -547,25 +538,6 @@ async function fillInfo(info) {
     finally { buttons.forEach(button => button.disabled = false); }
 }
 
-function showNotification(message, type = 'info') {
-    const existingNotification = document.querySelector('.notification');
-    if (existingNotification) existingNotification.remove();
-    // DYexb开发
-    
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    // 严禁付费传播
-    
-    requestAnimationFrame(() => {
-        notification.classList.add('show');
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => notification.remove(), 300);
-        }, 6000);
-    });
-}
 // DYexb版权所有
 
 function exportData() {
